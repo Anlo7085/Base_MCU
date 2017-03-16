@@ -12,6 +12,7 @@
 #define Start_Addr2             0x3232      //Post 2 Start Address, Offset from Slave Address
 #define Start_Addr3             0x3232      //Post 3 Start Address, Offset from Slave Address
 
+//Hello
 #define I2C_NUMBYTES          2
 
 /*struct I2CMSG {     For Reference
