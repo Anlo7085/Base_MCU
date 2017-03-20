@@ -40,10 +40,7 @@ __interrupt void xint1_isr(void)
 	float rotations_per_second = 1/seconds;
 	float stm = 60.0;
 	float arpm = rotations_per_second * stm; //rotations per minute.
-	if(arpm < 0.00 || arpm > 1000.0){}
-	else
-		rpm = (int)arpm + 1;
-
+	rpm = (int)arpm + 1;
 	counter1 = 0;
 
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
