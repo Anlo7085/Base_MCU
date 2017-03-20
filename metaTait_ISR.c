@@ -34,25 +34,19 @@ __interrupt void cpu_timer0_isr(void)
 
 __interrupt void xint1_isr(void)
 {
-    float uts = 20000.0;                    //This is the conversion from counter ticks to seconds. 20000*50us = 1 s
-    float seconds = counter1/uts;           //seconds per rotation
-    float espf = (seconds*1000000.0)/216.0;       //microseconds per refresh
-    Uint16 spf = (Uint16)espf;
-    float rotations_per_second = 1/seconds;
-    float stm = 60.0;                       //Seconds to minutes
-    float arpm = rotations_per_second * stm; //rotations per minute.
-    rpm = (int)arpm + 1;
-    counter1 = 0;
 
-    scia_xmit(4, rpm);                      //Send for debugging purposes the rpm to terminal.
+	float uts = 20000.0;											//This is the conversion from counter ticks to seconds.
+	float seconds = counter1/uts; //time in seconds per rotation
+	float rotations_per_second = 1/seconds;
+	float stm = 60.0;
+	float arpm = rotations_per_second * stm; //rotations per minute.
+	if(arpm < 0.00 || arpm > 1000.0){}
+	else
+		rpm = (int)arpm + 1;
 
-    spf = spf*1;
-    //send out spf
-    I2C_Write(&I2cMsgOut1);
-    I2C_Write(&I2cMsgOut2);
-    I2C_Write(&I2cMsgOut3);
+	counter1 = 0;
 
-    PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
+	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
 
 
