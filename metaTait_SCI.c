@@ -32,12 +32,9 @@ void sci_init(void)
     SciaRegs.SCICTL2.all = 0x0003;
     SciaRegs.SCICTL2.bit.TXINTENA = 1;
     SciaRegs.SCICTL2.bit.RXBKINTENA = 1;
-    SciaRegs.SCIHBAUD.all = 0x0001;             //0x0002
-    SciaRegs.SCILBAUD.all = 0x0046;           //0x008B
+    SciaRegs.SCIHBAUD.all = 0x0000;             //0x0002
+    SciaRegs.SCILBAUD.all = 0x0082;           //0x008B
     SciaRegs.SCICTL1.all = 0x0023;     // Relinquish SCI from Reset
-#if Integration_Test
-    SciaRegs.SCICCR.bit.LOOPBKENA = 1;
-#endif
     SciaRegs.SCIFFTX.all = 0xE040;      //SCIA FIFO Init
     SciaRegs.SCIFFRX.all = 0x2044;
     SciaRegs.SCIFFCT.all = 0x0;

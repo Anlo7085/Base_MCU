@@ -221,6 +221,9 @@ if(start_cmd != 1)
              }
           }
     }
+    int k = 0;
+    while(k!= 0);
+    k = 1;
     /*
     I2cMsgOut2.NumOfBytes = 2;
     I2cMsgOut2.MsgBuffer[0] = Pos2;
@@ -296,6 +299,7 @@ if(start_cmd != 1)
         I2C_Write(&I2cMsgOut3);
     }*/
    // target = 500;
+
 }
 #endif
 
