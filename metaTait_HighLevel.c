@@ -6,31 +6,17 @@
 #include "metaTait_SCI.h"
 #include "metaTait_ISR.h"
 
-#define Integration_Test        1
 
 
 int rpm;                //Will house our RPM value that the hall effect sensor data helps calculate
 int target = 0;         //Will be the value that the RPM is checked against
-Uint16 bright = 0;
-/*
-extern struct I2CMSG *CurrentMsgPtr;
-extern struct I2CMSG I2cMsgOut1;
-extern struct I2CMSG I2cMsgIn1;
-extern struct I2CMSG I2cMsgOut2;
-extern struct I2CMSG I2cMsgIn2;
-extern struct I2CMSG I2cMsgOut3;
-extern struct I2CMSG I2cMsgIn3;
-extern int passs;
-extern int fails;
-*/
 
 
+//##################### UART User Inputs ##################################################################################
 void receive_data(void)
 {
-
     Uint16 brightness;
     Uint16 start_cmd = 0;
-//    Uint16 Error = 0;
     Uint16 targetrpm[4];
     Uint16 target_rpm = 0;
 
@@ -81,6 +67,8 @@ void receive_data(void)
 
 }
 
+//##################### End of UART User Inputs ##################################################################################
+
 
 //##################### Send Image Data ##################################################################################
 
@@ -97,11 +85,8 @@ void image_data_send(void)
     int size;
     Uint16 holder = 0;
     Uint16 max_receive_bytes = 2048;
-
-
-#if Integration_Test
     Uint16 total_data_size = 32;
-#endif
+
 
     power_on();
     send_initial_clock_train();

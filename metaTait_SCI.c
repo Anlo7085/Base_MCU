@@ -1,8 +1,6 @@
 #include "metaTait_SCI.h"
 #include "F28x_Project.h"
 
-#define Integration_Test        1
-
 
 Uint16 scia_receive()                                       //UART Receive
 {
