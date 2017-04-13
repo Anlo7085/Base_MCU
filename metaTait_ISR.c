@@ -1,18 +1,18 @@
-#include "metaTait_HighLevel.h"
+//#include "metaTait_HighLevel.h"
 #include "metaTait_ISR.h"
 #include "F28x_Project.h"
-#include "metaTait_PWM.h"
-#include "metaTait_I2C.h"
+//#include "metaTait_PWM.h"
+//#include "metaTait_I2C.h"
 #include "metaTait_SCI.h"
 
 unsigned long counter1 = 0;
 extern int rpm;
 extern int target;
-EPWM_INFO epwm2_info;
+//EPWM_INFO epwm2_info;
 
-struct I2CMSG *CurrentMsgPtr;
-Uint16 PassCount;
-Uint16 FailCount;
+//struct I2CMSG *CurrentMsgPtr;
+//Uint16 PassCount;
+//Uint16 FailCount;
 
 extern struct I2CMSG I2cMsgOut1;
 extern struct I2CMSG I2cMsgOut2;
@@ -40,25 +40,28 @@ __interrupt void xint1_isr(void)
 	float rotations_per_second = 1/seconds;
 	float stm = 60.0;
 	float arpm = rotations_per_second * stm; //rotations per minute.
-	rpm = (int)arpm + 1;
+	if(arpm < 0.0 || arpm > ((float)target)*1.2);
+	else
+		rpm = (int)arpm + 1;
 	counter1 = 0;
 
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
 
 
-
+/*
 __interrupt void epwm2_isr(void)
 {
     update_compare(&epwm2_info);        //Change Duty Cycle
     EPwm2Regs.ETCLR.bit.INT = 1;
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
 }
-
+*/
 
 //
 // i2c_int1a_isr - I2CA ISR
 //
+/*
 __interrupt void i2c_int1a_isr(void)
 {
    Uint16 IntSource, i;
@@ -170,7 +173,7 @@ __interrupt void i2c_int1a_isr(void)
    //
    PieCtrlRegs.PIEACK.all = PIEACK_GROUP8;
 }
-
+*/
 
 
 
@@ -188,7 +191,7 @@ void enable_pie_block(void)
 void vector_table_init(void)
 {
     EALLOW; // This is needed to write to EALLOW protected registers
-    PieVectTable.EPWM2_INT = &epwm2_isr;
+//    PieVectTable.EPWM2_INT = &epwm2_isr;
     PieVectTable.TIMER0_INT = &cpu_timer0_isr;
     PieVectTable.XINT1_INT = &xint1_isr;
     EDIS;   // This is needed to disable write to EALLOW protected registers

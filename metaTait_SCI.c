@@ -13,27 +13,18 @@ Uint16 scia_receive()                                       //UART Receive
 
 void sci_init(void)
 {
-#if !Integration_Test
-    //Initialize GPIO 70 & 71 for PCB
 
-    GPIO_SetupPinMux(71, GPIO_MUX_CPU1, 1);                     //RX-TX Enable for SCIA
-    GPIO_SetupPinOptions(71, GPIO_INPUT, GPIO_PUSHPULL);        //RX Pin
-    GPIO_SetupPinMux(70, GPIO_MUX_CPU1, 1);
-    GPIO_SetupPinOptions(70, GPIO_OUTPUT, GPIO_ASYNC);          //TX-Pin*/
-#endif
-#if Integration_Test
-    GPIO_SetupPinMux(28, GPIO_MUX_CPU1, 1);
-    GPIO_SetupPinOptions(28, GPIO_INPUT, GPIO_PUSHPULL);
-    GPIO_SetupPinMux(29, GPIO_MUX_CPU1, 1);
-    GPIO_SetupPinOptions(29, GPIO_OUTPUT, GPIO_ASYNC);
-#endif
+    GPIO_SetupPinMux(84, GPIO_MUX_CPU1, 1);
+    GPIO_SetupPinOptions(84, GPIO_INPUT, GPIO_PUSHPULL);
+    GPIO_SetupPinMux(85, GPIO_MUX_CPU1, 1);
+    GPIO_SetupPinOptions(85, GPIO_OUTPUT, GPIO_ASYNC);
     SciaRegs.SCICCR.all = 0x0007;  // 1 stop bit,  No loopback, No parity, 8 char bits, async mode, idle-line protocol
     SciaRegs.SCICTL1.all = 0x0003; // enable TX, RX, internal SCICLK   Disable RX ERR, SLEEP, TXWAKE
     SciaRegs.SCICTL2.all = 0x0003;
     SciaRegs.SCICTL2.bit.TXINTENA = 1;
     SciaRegs.SCICTL2.bit.RXBKINTENA = 1;
-    SciaRegs.SCIHBAUD.all = 0x0000;             //0x0002
-    SciaRegs.SCILBAUD.all = 0x0082;           //0x008B
+    SciaRegs.SCIHBAUD.all = 0x0002;             //0x0002 Determining Baud Rate These Correspond to 200 MHz
+    SciaRegs.SCILBAUD.all = 0x008B;           //0x008B
     SciaRegs.SCICTL1.all = 0x0023;     // Relinquish SCI from Reset
     SciaRegs.SCIFFTX.all = 0xE040;      //SCIA FIFO Init
     SciaRegs.SCIFFRX.all = 0x2044;
