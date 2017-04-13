@@ -1,48 +1,11 @@
 
 #include "F28x_Project.h"
 #include "metaTait_HighLevel.h"
-//#include "metaTait_SPI.h"
-//#incldue "metaTait_McMSP_SPI.h"
+#include "metaTait_SPI.h"
+#include "metaTait_McBSP.h"
 #include "metaTait_SDCard.h"
 
 
-
-void InitSpi(void)
-{
-    // Initialize SPI-A
-
-    // Set reset low before configuration changes
-    // Clock polarity (0 == rising, 1 == falling)
-    // 16-bit character
-    // Enable loop-back
-    SpiaRegs.SPICCR.bit.SPISWRESET = 0;
-    SpiaRegs.SPICCR.bit.CLKPOLARITY = 0;
-    SpiaRegs.SPICCR.bit.SPICHAR = (16-1);
-    SpiaRegs.SPICCR.bit.SPILBK = 1;
-
-    // Enable master (0 == slave, 1 == master)
-    // Enable transmission (Talk)
-    // Clock phase (0 == normal, 1 == delayed)
-    // SPI interrupts are disabled
-    SpiaRegs.SPICTL.bit.MASTER_SLAVE = 1;
-    SpiaRegs.SPICTL.bit.TALK = 1;
-    SpiaRegs.SPICTL.bit.CLK_PHASE = 0;
-    SpiaRegs.SPICTL.bit.SPIINTENA = 0;
-
-    // Set the baud rate
-    SpiaRegs.SPIBRR.bit.SPI_BIT_RATE = SPI_BRR;
-
-    // Set FREE bit
-    // Halting on a breakpoint will not halt the SPI
-    SpiaRegs.SPIPRI.bit.FREE = 1;
-
-    // Release the SPI from reset
-    SpiaRegs.SPICCR.bit.SPISWRESET = 1;
-
-
-
-
-}
 
 
 void send_initial_clock_train (void)        //Change to whichever pins we are using.

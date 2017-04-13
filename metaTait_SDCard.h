@@ -4,21 +4,6 @@
 #include "F28x_Project.h"
 #include "metaTait_HighLevel.h"
 
-#define CPU_FRQ_120MHZ 0
-#define CPU_FRQ_200MHZ 1
-
-#if CPU_FRQ_200MHZ
-#define SPI_BRR        ((200E6 / 4) / 300E3) - 1
-#endif
-
-#if CPU_FRQ_150MHZ
-#define SPI_BRR        ((150E6 / 4) / 500E3) - 1
-#endif
-
-#if CPU_FRQ_120MHZ
-#define SPI_BRR        ((120E6 / 4) / 500E3) - 1
-#endif
-
 
 /* Definitions for MMC/SDC command */
 #define CMD0    (0x40+0)    /* GO_IDLE_STATE */
@@ -94,7 +79,6 @@ BYTE send_cmd(BYTE, DWORD);
 BYTE rcvr_spi(void);
 static void xmit_spi(BYTE);
 BYTE wait_ready(void);
-void InitSpi(void);
 void spi_fifo_init(void);
 void rcvr_spi_m (BYTE*);
 void power_on (void);
