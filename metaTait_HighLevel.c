@@ -67,95 +67,17 @@ void receive_data(void)
 	//SciaRegs.SCITXBUF.all= 0x1F;
 	while (SciaRegs.SCIFFRX.bit.RXFFST == 0);
 	brightness = scia_receive();
-	if (brightness < 0 || brightness > 0x1F)
-		for (;;);
 
 	scia_xmit(0, 0);
 	//SciaRegs.SCITXBUF.all= 1;
 	while (SciaRegs.SCIFFRX.bit.RXFFST == 0);
-	start_cmd = scia_receive();                //Receive Start Command via UART.
-	if (start_cmd != 1)
-		for (;;);
-
+	while(start_cmd != 1)
+		start_cmd = scia_receive();                //Receive Start Command via UART.
 /*
-    while(!passs && !fails)
-    {
-
-    if(I2cMsgOut1.MsgStatus == I2C_MSGSTAT_SEND_WITHSTOP)
-    {
-            Error = I2C_Write(&I2cMsgOut1);
-
-            //
-            // If communication is correctly initiated, set msg status to busy
-            // and update CurrentMsgPtr for the __interrupt service routine.
-            // Otherwise, do nothing and try again next loop. Once message is
-            // initiated, the I2C __interrupts will handle the rest. Search for
-            // ICINTR1A_ISR in the i2c_eeprom_isr.c file.
-            //
-            if (Error == I2C_SUCCESS)
-            {
-               CurrentMsgPtr = &I2cMsgOut1;
-               I2cMsgOut1.MsgStatus = I2C_MSGSTAT_WRITE_BUSY;
-            }
-    }
-    if (I2cMsgOut1.MsgStatus == I2C_MSGSTAT_INACTIVE)
-          {
-             //
-             // Check incoming message status.
-             //
-             if(I2cMsgIn1.MsgStatus == I2C_MSGSTAT_SEND_NOSTOP)
-             {
-                //
-                // EEPROM address setup portion
-                //
-                while(I2C_Read(&I2cMsgIn1) != I2C_SUCCESS)
-                {
-                   //
-                   // Maybe setup an attempt counter to break an infinite while
-                   // loop. The EEPROM will send back a NACK while it is performing
-                   // a write operation. Even though the write communique is
-                   // complete at this point, the EEPROM could still be busy
-                   // programming the data. Therefore, multiple attempts are
-                   // necessary.
-                   //
-                }
-                //
-                // Update current message pointer and message status
-                //
-                CurrentMsgPtr = &I2cMsgIn1;
-                I2cMsgIn1.MsgStatus = I2C_MSGSTAT_SEND_NOSTOP_BUSY;
-             }
-             //
-             // Once message has progressed past setting up the internal address
-             // of the EEPROM, send a restart to read the data bytes from the
-             // EEPROM. Complete the communique with a stop bit. MsgStatus is
-             // updated in the __interrupt service routine.
-             //
-             else if(I2cMsgIn1.MsgStatus == I2C_MSGSTAT_RESTART)
-             {
-                //
-                // Read data portion
-                //
-                while(I2C_Read(&I2cMsgIn1) != I2C_SUCCESS)
-                {
-                   //
-                   // Maybe setup an attempt counter to break an infinite while
-                   // loop.
-                   //
-                }
-                //
-                // Update current message pointer and message status
-                //
-                CurrentMsgPtr = &I2cMsgIn1;
-                I2cMsgIn1.MsgStatus = I2C_MSGSTAT_READ_BUSY;
-                Uint16 Input = I2caRegs.I2CDRR.all;
-             }
-          }
-    }
-    int k = 0;
-    while(k!= 0);
-    k = 1;
-    */
+	spia_xmit(brightness);
+	spib_xmit(brightness);
+	spic_xmit(brightness);
+*/
 
 }
 
@@ -172,7 +94,6 @@ void image_data_send(void)
     int j= 0;
     int k = 0;
     int l = 0;
-    int m = 0;
     int size;
     Uint16 holder = 0;
     Uint16 max_receive_bytes = 2048;
@@ -218,36 +139,26 @@ void image_data_send(void)
         rcvr_spi();                        /// Discard CRC
         rcvr_spi();
 
-        while(k < size/2)                         //Put it into I2C format to send out.
+        while(k < size/2)                         //Put it into SPI format to send out.
         {
             holder = buff[l] << 8;
             SD_Data[k]  = holder || buff[l+1];
             l = l+2;
             k++;
         }
-        while(m < size)
+        k = 0;
+        while(k < size/2)
         {
-/*
-            I2cMsgOut1.NumOfBytes = 2;
-            I2cMsgOut1.MsgBuffer[0] = SD_Data[m];
-
-            I2cMsgOut2.NumOfBytes = 2;
-            I2cMsgOut2.MsgBuffer[0] = SD_Data[m];
-
-            I2cMsgOut3.NumOfBytes = 2;
-            I2cMsgOut3.MsgBuffer[0] = SD_Data[m];
-
-            I2C_Write(&I2cMsgOut1);
-            I2C_Write(&I2cMsgOut2);
-            I2C_Write(&I2cMsgOut3);
-*/
-            m++;
+        	/*
+        	spia_xmit(SD_Data[k]);
+        	spib_xmit(SD_Data[k]);
+        	spic_xmit(SD_Data[k]);
+        	*/
+            k++;
         }
-        m = 0;
         i = i + size;
         j++;
         DELAY_US(20000000);         //Give the Post MCU's time to get the stuff into FRAM.
-        DELAY_US(20000000);
     }
 }
 //##################### End of Send Image Data ############################################################################

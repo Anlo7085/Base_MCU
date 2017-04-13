@@ -1,25 +1,11 @@
-//#include "metaTait_HighLevel.h"
+
 #include "metaTait_ISR.h"
 #include "F28x_Project.h"
-//#include "metaTait_PWM.h"
-//#include "metaTait_I2C.h"
 #include "metaTait_SCI.h"
 
 unsigned long counter1 = 0;
 extern int rpm;
 extern int target;
-//EPWM_INFO epwm2_info;
-
-//struct I2CMSG *CurrentMsgPtr;
-//Uint16 PassCount;
-//Uint16 FailCount;
-
-extern struct I2CMSG I2cMsgOut1;
-extern struct I2CMSG I2cMsgOut2;
-extern struct I2CMSG I2cMsgOut3;
-extern struct I2CMSG I2cMsgIn1;
-extern struct I2CMSG I2cMsgIn2;
-extern struct I2CMSG I2cMsgIn3;
 
 
 
@@ -37,145 +23,33 @@ __interrupt void xint1_isr(void)
 
 	float uts = 20000.0;											//This is the conversion from counter ticks to seconds.
 	float seconds = counter1/uts; //time in seconds per rotation
+	float f_refresh_window = seconds*100000000.0;
+	unsigned long refresh_window = (int)f_refresh_window;
 	float rotations_per_second = 1/seconds;
 	float stm = 60.0;
 	float arpm = rotations_per_second * stm; //rotations per minute.
 	if(arpm < 0.0 || arpm > ((float)target)*1.2);
 	else
+	{
 		rpm = (int)arpm + 1;
+		if(rpm >= target)
+		{
+			Uint16 upper = (refresh_window & 0xFFFF0000) >> 16;
+			Uint16 lower = (refresh_window & 0x0000FFFF);
+			/*
+			spia_xmit(upper);
+			spia_xmit(lower);
+			spib_xmit(upper);
+			spib_xmit(lower);
+			spic_xmit(upper);
+			spic_xmit(lower);
+			*/
+		}
+	}
 	counter1 = 0;
 
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
-
-
-/*
-__interrupt void epwm2_isr(void)
-{
-    update_compare(&epwm2_info);        //Change Duty Cycle
-    EPwm2Regs.ETCLR.bit.INT = 1;
-    PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
-}
-*/
-
-//
-// i2c_int1a_isr - I2CA ISR
-//
-/*
-__interrupt void i2c_int1a_isr(void)
-{
-   Uint16 IntSource, i;
-
-   //
-   // Read __interrupt source
-   //
-   IntSource = I2caRegs.I2CISRC.all;
-
-   //
-   // Interrupt source = stop condition detected
-   //
-   if(IntSource == I2C_SCD_ISRC)
-   {
-      //
-      // If completed message was writing data, reset msg to inactive state
-      //
-      if(CurrentMsgPtr->MsgStatus == I2C_MSGSTAT_WRITE_BUSY)
-      {
-         CurrentMsgPtr->MsgStatus = I2C_MSGSTAT_INACTIVE;
-      }
-      else
-      {
-         //
-         // If a message receives a NACK during the address setup portion of
-         // the EEPROM read, the code further below included in the register
-         // access ready __interrupt source code will generate a stop
-         // condition. After the stop condition is received (here), set the
-         // message status to try again. User may want to limit the number of
-         // retries before generating an error.
-         if(CurrentMsgPtr->MsgStatus == I2C_MSGSTAT_SEND_NOSTOP_BUSY)
-         {
-            CurrentMsgPtr->MsgStatus = I2C_MSGSTAT_SEND_NOSTOP;
-         }
-         //
-         // If completed message was reading EEPROM data, reset msg to inactive
-         // state and read data from FIFO.
-         //
-         else if(CurrentMsgPtr->MsgStatus == I2C_MSGSTAT_READ_BUSY)
-         {
-            CurrentMsgPtr->MsgStatus = I2C_MSGSTAT_INACTIVE;
-
-            for(i = 0; i < I2C_NUMBYTES-1; i++)
-            {
-                CurrentMsgPtr->MsgBuffer[i] = I2caRegs.I2CDRR.all;
-            }
-            for(i=0; i < I2C_NUMBYTES+1; i++)
-            {
-              CurrentMsgPtr->MsgBuffer[i] = I2caRegs.I2CDRR.all;
-            }
-         }
-         //
-         // Check received data
-         //
-         for(i=0; i < I2C_NUMBYTES; i++)
-         {
-            if(I2cMsgIn1.MsgBuffer[i] == I2cMsgOut1.MsgBuffer[i])
-            {
-                PassCount++;
-            }
-            else
-            {
-                FailCount++;
-            }
-         }
-         if(PassCount == I2C_NUMBYTES)
-         {
-            pass();
-         }
-         else
-         {
-            fail();
-         }
-        }
-       }
-
-
-
-   //
-   // Interrupt source = Register Access Ready
-   // This __interrupt is used to determine when the EEPROM address setup
-   // portion of the read data communication is complete. Since no stop bit is
-   // commanded, this flag tells us when the message has been sent instead of
-   // the SCD flag. If a NACK is received, clear the NACK bit and command a
-   // stop. Otherwise, move on to the read data portion of the communication.
-   //
-   else if(IntSource == I2C_ARDY_ISRC)
-   {
-      if(I2caRegs.I2CSTR.bit.NACK == 1)
-      {
-         I2caRegs.I2CMDR.bit.STP = 1;
-         I2caRegs.I2CSTR.all = I2C_CLR_NACK_BIT;
-      }
-      else if(CurrentMsgPtr->MsgStatus == I2C_MSGSTAT_SEND_NOSTOP_BUSY)
-      {
-         CurrentMsgPtr->MsgStatus = I2C_MSGSTAT_RESTART;
-      }
-   }
-   else
-   {
-      //
-      // Generate some error due to invalid __interrupt source
-      //
-      asm("   ESTOP0");
-   }
-
-   //
-   // Enable future I2C (PIE Group 8) __interrupts
-   //
-   PieCtrlRegs.PIEACK.all = PIEACK_GROUP8;
-}
-*/
-
-
 
 void enable_pie_block(void)
 {

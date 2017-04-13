@@ -37,6 +37,10 @@ void InitSpi(void)
 
     // Release the SPI from reset
     SpiaRegs.SPICCR.bit.SPISWRESET = 1;
+
+
+
+
 }
 
 
