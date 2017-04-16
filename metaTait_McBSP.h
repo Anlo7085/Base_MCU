@@ -22,7 +22,7 @@
 
 
 void init_mcbsp_spi(void);
-void mcbsp_xmit(int, int);
+void mcbsp_xmit(int);
 void error(void);
 
 void InitMcbspaGpio(void);

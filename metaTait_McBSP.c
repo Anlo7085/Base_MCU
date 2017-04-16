@@ -138,4 +138,10 @@ void clkg_delay_loop(void)
 }
 
 
+void mcbsp_xmit(int a) /*int b);*/
+{
+    //McbspaRegs.DXR2.all = b;
+    McbspaRegs.DXR1.all = a;
+}
+
 
