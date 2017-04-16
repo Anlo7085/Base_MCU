@@ -34,6 +34,9 @@ void init_mcbsp_spi()
     McbspbRegs.SPCR2.bit.XRST = 1;       // Release TX from Reset
     McbspbRegs.SPCR1.bit.RRST = 1;       // Release RX from Reset
     McbspbRegs.SPCR2.bit.FRST = 1;       // Frame Sync Generator reset
+
+    McbspbRegs.SPCR1.bit.DLB = 0;
+    McbspbRegs.SPCR2.bit.DLB = 0;
 }
 
 
