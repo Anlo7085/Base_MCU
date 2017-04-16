@@ -46,11 +46,6 @@
 			<locationURI>INSTALLROOT_F2837XS/F2837xS_common/source/F2837xS_DefaultISR.c</locationURI>
 		</link>
 		<link>
-			<name>F2837xS_EPwm.c</name>
-			<type>1</type>
-			<locationURI>INSTALLROOT_F2837XS/F2837xS_common/source/F2837xS_EPwm.c</locationURI>
-		</link>
-		<link>
 			<name>F2837xS_GlobalVariableDefs.c</name>
 			<type>1</type>
 			<locationURI>INSTALLROOT_F2837XS/F2837xS_headers/source/F2837xS_GlobalVariableDefs.c</locationURI>
