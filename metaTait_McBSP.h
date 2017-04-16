@@ -23,10 +23,9 @@
 
 
 
-void InitMcbspaGpio(void);
+void InitMcbspbGpio(void);
 void init_mcbsp_spi(void);
 void mcbsp_xmit(int);
-
 
 void delay_loop(void);
 void clkg_delay_loop(void);

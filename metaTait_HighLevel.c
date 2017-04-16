@@ -6,25 +6,26 @@
 #include "metaTait_SCI.h"
 #include "metaTait_ISR.h"
 #include "metaTait_SPI.h"
+#include "metaTait_McBSP.h"
 
 
-
+extern Uint16 led_brightness;
 int rpm;                //Will house our RPM value that the hall effect sensor data helps calculate
 int target = 0;         //Will be the value that the RPM is checked against
 
 
 //##################### UART User Inputs ##################################################################################
-void receive_data(void)
+void transmit(void)
 {
     Uint16 brightness;
-    Uint16 start_cmd = 0;
-    Uint16 targetrpm[4];
-    Uint16 target_rpm = 0;
+    //Uint16 start_cmd = 0;
+    //Uint16 targetrpm[4];
+    //Uint16 target_rpm = 0;
 
 
   //  image_data_send();                                  //Send Image Data to the Posts.
 
-
+/*
     //SciaRegs.SCITXBUF.all= 0;
     scia_xmit(1, 0);
 	while (ScibRegs.SCIFFRX.bit.RXFFST == 0);
@@ -60,8 +61,9 @@ void receive_data(void)
 	while (ScibRegs.SCIFFRX.bit.RXFFST == 0);
 	while(start_cmd != 1)
 		start_cmd = scia_receive();                //Receive Start Command via UART.
-
-	spia_xmit(brightness);
+*/
+    brightness = led_brightness;
+	mcbsp_xmit(brightness);
 	spib_xmit(brightness);
 	spic_xmit(brightness);
 
@@ -135,7 +137,7 @@ void image_data_send(void)
         k = 0;
         while(k < size/2)
         {
-        	spia_xmit(SD_Data[k]);
+        	mcbsp_xmit(SD_Data[k]);
         	spib_xmit(SD_Data[k]);
         	spic_xmit(SD_Data[k]);
             k++;

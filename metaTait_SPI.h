@@ -26,8 +26,8 @@
 
 
 void InitSpi(void);
-void InitSpiaGpio(void);
-void spia_xmit(Uint16);
+void spi_fifo_init(void);
+void InitSpiGpio(void);
 void spib_xmit(Uint16);
 void spic_xmit(Uint16);
 
