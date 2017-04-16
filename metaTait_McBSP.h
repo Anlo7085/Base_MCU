@@ -21,12 +21,13 @@
 #define MCBSP_CLKG_DELAY     2*(CPU_SPD/(MCBSP_SRG_FREQ/(1+CLKGDV_VAL)))
 
 
-void init_mcbsp_spi(void);
-void mcbsp_xmit(int);
-void error(void);
+
 
 void InitMcbspaGpio(void);
 void init_mcbsp_spi(void);
+void mcbsp_xmit(int);
+
+
 void delay_loop(void);
 void clkg_delay_loop(void);
 

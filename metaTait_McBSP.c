@@ -22,8 +22,8 @@ void init_mcbsp_spi()
     McbspaRegs.XCR2.bit.XDATDLY = 01;    // FSX setup time 1 in master mode.
                                          // 0 for slave mode (Transmit)
 
-    McbspaRegs.RCR1.bit.RWDLEN1 = 5;     // 32-bit word
-    McbspaRegs.XCR1.bit.XWDLEN1 = 5;     // 32-bit word
+    McbspaRegs.RCR1.bit.RWDLEN1 = 2;     // 16-bit read
+    McbspaRegs.XCR1.bit.XWDLEN1 = 2;     // 16-bit write
 
     McbspaRegs.SRGR2.all = 0x2000;       // CLKSM=1, FPER = 1 CLKG periods
     McbspaRegs.SRGR1.all = 0x000F;       // Frame Width = 1 CLKG period,
