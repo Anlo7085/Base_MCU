@@ -2,6 +2,7 @@
 #include "metaTait_ISR.h"
 #include "F28x_Project.h"
 #include "metaTait_SCI.h"
+#include "metaTait_SPI.h"
 
 unsigned long counter1 = 0;
 extern int rpm;
@@ -36,14 +37,14 @@ __interrupt void xint1_isr(void)
 		{
 			Uint16 upper = (refresh_window & 0xFFFF0000) >> 16;
 			Uint16 lower = (refresh_window & 0x0000FFFF);
-			/*
+
 			spia_xmit(upper);
 			spia_xmit(lower);
 			spib_xmit(upper);
 			spib_xmit(lower);
 			spic_xmit(upper);
 			spic_xmit(lower);
-			*/
+
 		}
 	}
 	counter1 = 0;

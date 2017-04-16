@@ -12,7 +12,7 @@
 #define CPU_FRQ_200MHZ 1
 
 #if CPU_FRQ_200MHZ
-#define SPI_BRR        ((200E6 / 4) / 300E3) - 1
+#define SPI_BRR        3
 #endif
 
 #if CPU_FRQ_150MHZ
@@ -26,6 +26,10 @@
 
 
 void InitSpi(void);
+void InitSpiaGpio(void);
+void spia_xmit(Uint16);
+void spib_xmit(Uint16);
+void spic_xmit(Uint16);
 
 
 #endif /* METATAIT_SPI_H_ */

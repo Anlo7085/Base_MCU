@@ -5,6 +5,7 @@
 #include "metaTait_SDCard.h"
 #include "metaTait_SCI.h"
 #include "metaTait_ISR.h"
+#include "metaTait_SPI.h"
 
 
 
@@ -21,28 +22,28 @@ void receive_data(void)
     Uint16 target_rpm = 0;
 
 
-    image_data_send();                                  //Send Image Data to the Posts.
+  //  image_data_send();                                  //Send Image Data to the Posts.
 
 
     //SciaRegs.SCITXBUF.all= 0;
     scia_xmit(1, 0);
-	while (SciaRegs.SCIFFRX.bit.RXFFST == 0);
+	while (ScibRegs.SCIFFRX.bit.RXFFST == 0);
 	targetrpm[3] = scia_receive();
 
 	target_rpm = target_rpm + ((int) targetrpm[3] * 1000);
 
 	//SciaRegs.SCITXBUF.all= 5;
-	while (SciaRegs.SCIFFRX.bit.RXFFST == 0);
+	while (ScibRegs.SCIFFRX.bit.RXFFST == 0);
 	targetrpm[2] = scia_receive();
 	target_rpm = target_rpm + ((int) targetrpm[2] * 100);
 
 	//SciaRegs.SCITXBUF.all= 1;
-	while (SciaRegs.SCIFFRX.bit.RXFFST == 0);
+	while (ScibRegs.SCIFFRX.bit.RXFFST == 0);
 	targetrpm[1] = scia_receive();
 	target_rpm = target_rpm + ((int) targetrpm[1] * 10);
 
 	//SciaRegs.SCITXBUF.all= 0;
-	while (SciaRegs.SCIFFRX.bit.RXFFST == 0);
+	while (ScibRegs.SCIFFRX.bit.RXFFST == 0);
 	targetrpm[0] = scia_receive();
 	target_rpm = target_rpm + ((int) targetrpm[0] * 1);
 	target = target_rpm;                 //Put RPM value into target rpm global.
@@ -51,19 +52,19 @@ void receive_data(void)
 
 	scia_xmit(2, 0);
 	//SciaRegs.SCITXBUF.all= 0x1F;
-	while (SciaRegs.SCIFFRX.bit.RXFFST == 0);
+	while (ScibRegs.SCIFFRX.bit.RXFFST == 0);
 	brightness = scia_receive();
 
 	scia_xmit(0, 0);
 	//SciaRegs.SCITXBUF.all= 1;
-	while (SciaRegs.SCIFFRX.bit.RXFFST == 0);
+	while (ScibRegs.SCIFFRX.bit.RXFFST == 0);
 	while(start_cmd != 1)
 		start_cmd = scia_receive();                //Receive Start Command via UART.
-/*
+
 	spia_xmit(brightness);
 	spib_xmit(brightness);
 	spic_xmit(brightness);
-*/
+
 
 }
 
@@ -134,11 +135,9 @@ void image_data_send(void)
         k = 0;
         while(k < size/2)
         {
-        	/*
         	spia_xmit(SD_Data[k]);
         	spib_xmit(SD_Data[k]);
         	spic_xmit(SD_Data[k]);
-        	*/
             k++;
         }
         i = i + size;
