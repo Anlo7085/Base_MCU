@@ -12,10 +12,9 @@
 extern Uint16 led_brightness;
 
 
-//##################### UART User Inputs ##################################################################################
+//##################### Transmit Brightness Function ##########################################################################
 void transmit(void)
 {
-    Uint16 brightness;
     //Uint16 start_cmd = 0;
     //Uint16 targetrpm[4];
     //Uint16 target_rpm = 0;
@@ -60,18 +59,17 @@ void transmit(void)
 	while(start_cmd != 1)
 		start_cmd = scia_receive();                //Receive Start Command via UART.
 */
-    brightness = led_brightness;
-	mcbsp_xmit(brightness);
-	spib_xmit(brightness);
-	spic_xmit(brightness);
+	mcbsp_xmit(led_brightness);
+	spib_xmit(led_brightness);
+	spic_xmit(led_brightness);
 
 
 }
 
-//##################### End of UART User Inputs ##################################################################################
+//##################### End of Transmit Brightness Function ###################################################################
 
 
-//##################### Send Image Data ##################################################################################
+//##################### Send Image Data #######################################################################################
 
 void image_data_send(void)
 {

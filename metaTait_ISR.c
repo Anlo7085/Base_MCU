@@ -34,15 +34,17 @@ __interrupt void xint2_isr(void)
 		rpm = (int)arpm + 1;
 		if(refresh_counter == 5)
 		{
-			refresh_counter == 0;
+			refresh_counter = 0;
 			if(rpm >= target_rpm)
 			{
 				Uint16 upper = (refresh_window & 0xFFFF0000) >> 16;
 				Uint16 lower = (refresh_window & 0x0000FFFF);
 				mcbsp_xmit(upper);
 				mcbsp_xmit(lower);
+
 				spib_xmit(upper);
 				spib_xmit(lower);
+
 				spic_xmit(upper);
 				spic_xmit(lower);
 			}

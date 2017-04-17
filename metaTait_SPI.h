@@ -12,7 +12,7 @@
 #define CPU_FRQ_200MHZ 1
 
 #if CPU_FRQ_200MHZ
-#define SPI_BRR        3
+#define SPI_BRR        16
 #endif
 
 #if CPU_FRQ_150MHZ

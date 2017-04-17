@@ -11,7 +11,6 @@ void init_mcbsp_spi()
     McbspbRegs.SPCR1.all = 0x0000;       // Reset Receiver, Right justify word,
                                          // Digital loopback dis.
     McbspbRegs.PCR.all = 0x0F08;         //(CLKXM=CLKRM=FSXM=FSRM= 1, FSXP = 1)
-    McbspbRegs.SPCR1.bit.DLB = 1;
     McbspbRegs.SPCR1.bit.CLKSTP = 2;     // Together with CLKXP/CLKRP
                                          // determines clocking scheme
     McbspbRegs.PCR.bit.CLKXP = 0;        // CPOL = 0, CPHA = 0 rising edge
@@ -22,11 +21,11 @@ void init_mcbsp_spi()
     McbspbRegs.XCR2.bit.XDATDLY = 01;    // FSX setup time 1 in master mode.
                                          // 0 for slave mode (Transmit)
 
-    McbspbRegs.RCR1.bit.RWDLEN1 = 2;     // 16-bit read
-    McbspbRegs.XCR1.bit.XWDLEN1 = 2;     // 16-bit write
+    McbspbRegs.RCR1.bit.RWDLEN1 = 5;     // 16-bit read
+    McbspbRegs.XCR1.bit.XWDLEN1 = 5;     // 16-bit write
 
     McbspbRegs.SRGR2.all = 0x2000;       // CLKSM=1, FPER = 1 CLKG periods
-    McbspbRegs.SRGR1.all = 0x000F;       // Frame Width = 1 CLKG period,
+    McbspbRegs.SRGR1.all = 0x0003;       // Frame Width = 1 CLKG period, Was originally F
                                          // CLKGDV=16
 
     McbspbRegs.SPCR2.bit.GRST = 1;       // Enable the sample rate generator
@@ -57,8 +56,8 @@ void InitMcbspbGpio(void)
     // GPIO84
     //
     //GpioCtrlRegs.GPAMUX2.bit.GPIO24 = 3;
-    GpioCtrlRegs.GPAGMUX1.bit.GPIO12 = 1;
-    GpioCtrlRegs.GPAMUX1.bit.GPIO12 = 2;
+   // GpioCtrlRegs.GPAGMUX1.bit.GPIO12 = 1;
+    GpioCtrlRegs.GPAMUX1.bit.GPIO12 = 3;
 
     //
     // MDRB
@@ -148,7 +147,7 @@ void clkg_delay_loop(void)
 
 void mcbsp_xmit(int a) /*int b);*/
 {
-    //McbspaRegs.DXR2.all = b;
+   // McbspaRegs.DXR2.all = a; //b
     McbspbRegs.DXR1.all = a;
 }
 
