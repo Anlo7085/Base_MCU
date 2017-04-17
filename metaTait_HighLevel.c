@@ -10,8 +10,6 @@
 
 
 extern Uint16 led_brightness;
-int rpm;                //Will house our RPM value that the hall effect sensor data helps calculate
-int target = 0;         //Will be the value that the RPM is checked against
 
 
 //##################### UART User Inputs ##################################################################################

@@ -11,9 +11,7 @@ void enable_pie_block(void);
 
 /* Interrupt Service Routines */
 __interrupt void cpu_timer0_isr(void);
-__interrupt void epwm2_isr(void);
-__interrupt void xint1_isr(void);
-__interrupt void i2c_int1a_isr(void);
+__interrupt void xint2_isr(void);
 
 
 
