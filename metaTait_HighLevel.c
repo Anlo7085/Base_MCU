@@ -59,6 +59,7 @@ void transmit(void)
 	while(start_cmd != 1)
 		start_cmd = scia_receive();                //Receive Start Command via UART.
 */
+	while(McbspbRegs.SPCR2.bit.XRDY == 0);
 	mcbsp_xmit(led_brightness);
 	spib_xmit(led_brightness);
 	spic_xmit(led_brightness);

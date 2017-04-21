@@ -16,25 +16,34 @@ void init_mcbsp_spi()
     McbspbRegs.PCR.bit.CLKXP = 0;        // CPOL = 0, CPHA = 0 rising edge
                                          // no delay
     McbspbRegs.PCR.bit.CLKRP = 0;
-    McbspbRegs.RCR2.bit.RDATDLY = 01;    // FSX setup time 1 in master mode.
+    McbspbRegs.PCR.bit.SCLKME = 0;
+    McbspbRegs.PCR.bit.FSXM = 1;
+    McbspbRegs.PCR.bit.FSXP = 1;
+
+    McbspbRegs.SRGR2.bit.CLKSM = 1;
+
+    McbspbRegs.RCR2.bit.RDATDLY = 0b01;    // FSX setup time 1 in master mode.
                                          // 0 for slave mode (Receive)
-    McbspbRegs.XCR2.bit.XDATDLY = 01;    // FSX setup time 1 in master mode.
+    McbspbRegs.XCR2.bit.XDATDLY = 0b01;    // FSX setup time 1 in master mode.
                                          // 0 for slave mode (Transmit)
 
-    McbspbRegs.RCR1.bit.RWDLEN1 = 5;     // 16-bit read
-    McbspbRegs.XCR1.bit.XWDLEN1 = 5;     // 16-bit write
+    McbspbRegs.RCR1.bit.RWDLEN1 = 2;     // 16-bit read
+    McbspbRegs.XCR1.bit.XWDLEN1 = 2;     // 16-bit write
 
     McbspbRegs.SRGR2.all = 0x2000;       // CLKSM=1, FPER = 1 CLKG periods
-    McbspbRegs.SRGR1.all = 0x0003;       // Frame Width = 1 CLKG period, Was originally F
-                                         // CLKGDV=16
+    McbspbRegs.SRGR1.all = 0x000B;       // Frame Width = 1 CLKG period, cannot go lower than this as it throws out the highest order bit.
+                                         // CLKGDV= 16;
 
+    McbspbRegs.SRGR2.bit.FSGM= 0;
+    McbspbRegs.SPCR1.bit.DLB = 0;
     McbspbRegs.SPCR2.bit.GRST = 1;       // Enable the sample rate generator
     delay_loop();                        // Wait at least 2 SRG clock cycles
     McbspbRegs.SPCR2.bit.XRST = 1;       // Release TX from Reset
     McbspbRegs.SPCR1.bit.RRST = 1;       // Release RX from Reset
     McbspbRegs.SPCR2.bit.FRST = 1;       // Frame Sync Generator reset
 
-    McbspbRegs.SPCR1.bit.DLB = 0;
+
+
 }
 
 
@@ -147,7 +156,7 @@ void clkg_delay_loop(void)
 
 void mcbsp_xmit(int a) /*int b);*/
 {
-   // McbspaRegs.DXR2.all = a; //b
+    //McbspbRegs.DXR2.all = a; //b
     McbspbRegs.DXR1.all = a;
 }
 
