@@ -5,10 +5,13 @@
 #include "metaTait_McBSP.h"
 #include "metaTait_SDCard.h"
 
+#define round(x) (x<0.0)?(int16)(x-0.5):(int16)(x+0.5)
+
 extern int timer_function;
 unsigned long counter1 = 0;
 float rpmS = -1;                //Will house our RPM value that the hall effect sensor data helps calculate
 extern int target_rpm;         //Will be the value that the RPM is checked against
+int numBad = 0;
 
 
 
@@ -36,28 +39,47 @@ __interrupt void xint2_isr(void)
 	float rotations_per_second = 1/seconds;
 	float stm = 60.0;
 	float rpmf = rotations_per_second * stm; //rotations per minute calc, including noise.
-	if (rpmS == -1 && rpmf > 30 && rpmf < 60) {   //initial set of stable RPM
+	if (rpmS == -1 && rpmf > 30 && rpmf < 100) {   //initial set of stable RPM
 	    rpmS = rpmf;
+	    numBad++;
+        if(numBad > 10) {  //re-calibration if tracking along a noisy value for 10 consecutive updates
+            rpmS = rpmf;
+            numBad = 0;
+        }
 	}
 	if(rpmf < rpmS*.8 || rpmf > rpmS*1.2);   //throw out rpm calcs greater than 20% off previous value
 	else
 	{
+	    numBad = 0;
 	    rpmS = rpmf;  //set most recent read to stable RPM decimal to be used
 	    rotations_per_second = rpmf/60.0;
-	    float refresh_windo = (1.0/rotations_per_second)*1000000.0; //refresh window - put in terms of microseconds for ease of coding.
-	    unsigned long refresh_window = (unsigned long)refresh_windo;
-	    Uint16 upper = (refresh_window & 0xFFFF0000) >> 16;
-	    Uint16 lower = (refresh_window & 0x0000FFFF);
+	    float refWin = (1.0/rotations_per_second)*1000000.0/216.0;
+	    //refWin = roundf(refWin); //LED refresh window - put in terms of microseconds
+
+	    // NEW 16-BIT TRANSMIT REFRESH WINDOW:
+	    Uint16 refresh_windo = (Uint16)(refWin); //cast to 16-bits for transmission
 	    while(McbspbRegs.SPCR2.bit.XRDY == 0);
+	    mcbsp_xmit(refresh_windo);
+
+        // OLD 32-BIT TRANSMIT:
+    /*
+        unsigned long refresh_window = (unsigned long)refresh_windo;
+        Uint16 upper = (refresh_window & 0xFFFF0000) >> 16;
+        Uint16 lower = (refresh_window & 0x0000FFFF);
+
+
 	    mcbsp_xmit(upper);
 		while(McbspbRegs.SPCR2.bit.XRDY == 0);
-		DELAY_US(4000);
+
+		DELAY_US(4000);  //needed?
 		mcbsp_xmit(lower);
 		spib_xmit(upper);
 		spib_xmit(lower);
 		spic_xmit(upper);
 		spic_xmit(lower);
+    */
 	}
+
 	counter1 = 0; //BASE
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
