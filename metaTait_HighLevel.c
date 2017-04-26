@@ -9,7 +9,8 @@
 #include "metaTait_McBSP.h"
 
 
-extern Uint16 led_brightness;
+//int timer_function = 0;
+extern Uint16 led_brightness_scalar;
 
 
 //##################### Transmit Brightness Function ##########################################################################
@@ -59,10 +60,11 @@ void transmit(void)
 	while(start_cmd != 1)
 		start_cmd = scia_receive();                //Receive Start Command via UART.
 */
+
 	while(McbspbRegs.SPCR2.bit.XRDY == 0);
-	mcbsp_xmit(led_brightness);
-	spib_xmit(led_brightness);
-	spic_xmit(led_brightness);
+	mcbsp_xmit(led_brightness_scalar);
+	spib_xmit(led_brightness_scalar);
+	spic_xmit(led_brightness_scalar);
 
 
 }
@@ -85,12 +87,20 @@ void image_data_send(void)
     int size;
     Uint16 holder = 0;
     Uint16 max_receive_bytes = 2048;
-    Uint16 total_data_size = 32;
+    Uint16 total_data_size = 2;
 
+    /*
+    DINT;
+	ConfigCpuTimer(&CpuTimer0, 190, 10000); 	//Initialize CPU Timer Interrupt to 10 ms, 190 MHz Clock Frequency
+	CpuTimer0Regs.TCR.all = 0x4001;
+	vector_table_init();
+	enable_pie_block();
 
-    power_on();
-    send_initial_clock_train();
-    wait_ready();
+	IER |= M_INT1;
+	EINT;
+    disk_initialize(0);
+*/
+
 
     while(j <= total_data_size/max_receive_bytes)
     {
@@ -105,24 +115,7 @@ void image_data_send(void)
             size= total_data_size%max_receive_bytes;
         }
 
-        send_cmd(CMD17, i);
-        BYTE token;
-        Timer1 = 10;
-        do                              // Wait for data packet in timeout of 100ms
-        {
-            token = rcvr_spi();
-        }
-        while ((token == 0xFF) && Timer1);
-        if(token != 0xFE) return;    // If not valid data token, return with error
-
-        do                              // Receive the data block into buffer
-        {
-            rcvr_spi_m(buff++); //buff++;
-            rcvr_spi_m(buff++); //buff++;
-        }
-        while (btr -= 2);
-        rcvr_spi();                        /// Discard CRC
-        rcvr_spi();
+        //disk_read(0, buff, i, 4);
 
         while(k < size/2)                         //Put it into SPI format to send out.
         {

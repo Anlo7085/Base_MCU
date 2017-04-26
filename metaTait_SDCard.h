@@ -74,6 +74,22 @@ typedef unsigned long   DWORD;
 
 
 
+#define GET_SECTOR_COUNT	1
+#define GET_SECTOR_SIZE		2
+#define CTRL_SYNC			3
+#define CTRL_POWER			4
+#define CTRL_LOCK			5
+#define CTRL_EJECT			6
+#define MMC_GET_CSD			10
+#define MMC_GET_CID			11
+#define MMC_GET_OCR			12
+#define ATA_GET_REV			20
+#define ATA_GET_MODEL		21
+#define ATA_GET_SN			22
+
+
+
+
 /* Reading from SD Card via SPI Functions */
 BYTE send_cmd(BYTE, DWORD);
 BYTE rcvr_spi(void);
@@ -82,8 +98,12 @@ BYTE wait_ready(void);
 void spi_fifo_init(void);
 void rcvr_spi_m (BYTE*);
 void power_on (void);
+DSTATUS disk_initialize(BYTE);
+DSTATUS disk_status(BYTE);
+DRESULT disk_read (BYTE, BYTE*, DWORD, BYTE);
 void send_initial_clock_train (void);
 static BOOL rcvr_datablock(BYTE*, UINT);
+void disk_timerproc (void);
 
 
 

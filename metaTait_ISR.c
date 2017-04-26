@@ -3,17 +3,26 @@
 #include "metaTait_SCI.h"
 #include "metaTait_SPI.h"
 #include "metaTait_McBSP.h"
+#include "metaTait_SDCard.h"
 
+extern int timer_function;
 unsigned long counter1 = 0;
-int rpm;                //Will house our RPM value that the hall effect sensor data helps calculate
+float rpmS = -1;                //Will house our RPM value that the hall effect sensor data helps calculate
 extern int target_rpm;         //Will be the value that the RPM is checked against
-int refresh_counter = 0;
 
 
 
 __interrupt void cpu_timer0_isr(void)
 {
-   counter1++;
+	/*
+   if(!timer_function)
+   {
+	   disk_timerproc();
+   }
+   else
+   {*/
+	   counter1++;
+   //}
    PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
 
@@ -21,39 +30,35 @@ __interrupt void cpu_timer0_isr(void)
 
 __interrupt void xint2_isr(void)
 {
-	float uts = 20000.0;											//This is the conversion from counter ticks to seconds.
+
+	float uts = 20000.0;                                            //This is the conversion from counter ticks to seconds.
 	float seconds = counter1/uts; //time in seconds per rotation
-	float f_refresh_window = seconds*100000000.0;
-	unsigned long refresh_window = (int)f_refresh_window;
 	float rotations_per_second = 1/seconds;
 	float stm = 60.0;
-	float arpm = rotations_per_second * stm; //rotations per minute.
-	if(arpm < 0.0 || arpm > ((float)target_rpm)*1.2);
+	float rpmf = rotations_per_second * stm; //rotations per minute calc, including noise.
+	if (rpmS == -1 && rpmf > 30 && rpmf < 60) {   //initial set of stable RPM
+	    rpmS = rpmf;
+	}
+	if(rpmf < rpmS*.8 || rpmf > rpmS*1.2);   //throw out rpm calcs greater than 20% off previous value
 	else
 	{
-		rpm = (int)arpm + 1;
-		if(refresh_counter == 5)
-		{
-			refresh_counter = 0;
-			if(rpm >= target_rpm)
-			{
-				Uint16 upper = (refresh_window & 0xFFFF0000) >> 16;
-				Uint16 lower = (refresh_window & 0x0000FFFF);
-				mcbsp_xmit(upper);
-				mcbsp_xmit(lower);
-
-				spib_xmit(upper);
-				spib_xmit(lower);
-
-				spic_xmit(upper);
-				spic_xmit(lower);
-			}
-		}
-		else
-			refresh_counter++;
+	    rpmS = rpmf;  //set most recent read to stable RPM decimal to be used
+	    rotations_per_second = rpmf/60.0;
+	    float refresh_windo = (1.0/rotations_per_second)*1000000.0; //refresh window - put in terms of microseconds for ease of coding.
+	    unsigned long refresh_window = (unsigned long)refresh_windo;
+	    Uint16 upper = (refresh_window & 0xFFFF0000) >> 16;
+	    Uint16 lower = (refresh_window & 0x0000FFFF);
+	    while(McbspbRegs.SPCR2.bit.XRDY == 0);
+	    mcbsp_xmit(upper);
+		while(McbspbRegs.SPCR2.bit.XRDY == 0);
+		DELAY_US(4000);
+		mcbsp_xmit(lower);
+		spib_xmit(upper);
+		spib_xmit(lower);
+		spic_xmit(upper);
+		spic_xmit(lower);
 	}
-	counter1 = 0;
-
+	counter1 = 0; //BASE
 	PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
 
