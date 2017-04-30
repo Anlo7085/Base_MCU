@@ -39,7 +39,7 @@ __interrupt void xint2_isr(void)
 	float rotations_per_second = 1/seconds;
 	float stm = 60.0;
 	float rpmf = rotations_per_second * stm; //rotations per minute calc, including noise.
-	if (rpmS == -1 && rpmf > 30 && rpmf < 100) {   //initial set of stable RPM
+	if (rpmS == -1 && rpmf > 30 && rpmf < 35) {   //initial set of stable RPM
 	    rpmS = rpmf;
 	    numBad++;
         if(numBad > 10) {  //re-calibration if tracking along a noisy value for 10 consecutive updates
@@ -54,30 +54,23 @@ __interrupt void xint2_isr(void)
 	    rpmS = rpmf;  //set most recent read to stable RPM decimal to be used
 	    rotations_per_second = rpmf/60.0;
 	    float refWin = (1.0/rotations_per_second)*1000000.0/216.0;
-	    //refWin = roundf(refWin); //LED refresh window - put in terms of microseconds
 
 	    // NEW 16-BIT TRANSMIT REFRESH WINDOW:
 	    Uint16 refresh_windo = (Uint16)(refWin); //cast to 16-bits for transmission
+	    /*
+	    if(refresh_windo >> 15)
+	    {
+	    	refresh_windo = refresh_windo | 0x0001;
+	    }
+	    else
+	    {
+	    	refresh_windo = refresh_windo & 0xFFFE;
+	    }*/
+
+
+
 	    while(McbspbRegs.SPCR2.bit.XRDY == 0);
 	    mcbsp_xmit(refresh_windo);
-
-        // OLD 32-BIT TRANSMIT:
-    /*
-        unsigned long refresh_window = (unsigned long)refresh_windo;
-        Uint16 upper = (refresh_window & 0xFFFF0000) >> 16;
-        Uint16 lower = (refresh_window & 0x0000FFFF);
-
-
-	    mcbsp_xmit(upper);
-		while(McbspbRegs.SPCR2.bit.XRDY == 0);
-
-		DELAY_US(4000);  //needed?
-		mcbsp_xmit(lower);
-		spib_xmit(upper);
-		spib_xmit(lower);
-		spic_xmit(upper);
-		spic_xmit(lower);
-    */
 	}
 
 	counter1 = 0; //BASE
